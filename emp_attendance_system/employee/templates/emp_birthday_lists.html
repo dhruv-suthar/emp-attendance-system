@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+	<title>Upcoming Employees Birthday</title>
+	<style type="text/css">
+		table
+		{
+			margin: 0 auto;
+		}
+		th {
+	    background-color: #f2f2f2;
+	    text-align: left;
+	    padding: 8px;
+	  }
+	  
+	  tr:nth-child(even) {
+	    background-color: #f9f9f9;
+	  }
+	  
+	  td {
+	    padding: 8px;
+	    border-bottom: 1px solid #ddd;
+	  }
+	</style>
+	</head>
+	<body>
+
+		<center>
+			<h3>Employee birthdays</h3>
+		</center>
+		
+		<table class="table">
+		  <thead>
+		    <tr>
+		      <th>Name</th>
+		      <th>Email</th>
+		       <th>Birth date</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		    {% for employee in upcoming_emps_bd %}
+		    <tr>
+		      <td>{{ employee.name }}</td>
+		      <td>{{ employee.email }}</td>
+		      <td>{{ employee.dob }}</td>
+		    </tr>
+		    {% endfor %}
+		  </tbody>
+		</table>
+		<center>
+			<a href="/emp_login">Emp Login</a>
+		</center>
+	</body>
+</html>
+
+

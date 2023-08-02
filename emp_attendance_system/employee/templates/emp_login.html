@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+	<head>
+		<title>Emp Login</title>
+		<style>
+
+
+	    #login-form {
+	        max-width: 400px;
+	        margin: 0 auto;
+	        padding: 20px;
+	        background-color: #f6f8fa;
+	        border: 1px solid #e1e4e8;
+	        border-radius: 6px;
+	        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+	    }
+
+	    #login-form label {
+	        display: block;
+	        margin-bottom: 6px;
+	        font-weight: 600;
+	        color: #24292e;
+	    }
+
+	    #login-form input[type="email"],
+	    #login-form input[type="password"] {
+	        width: 95%;
+	        padding: 10px;
+	        font-size: 14px;
+	        margin: 0 auto;
+	        border: 1px solid #e1e4e8;
+	        border-radius: 6px;
+	    }
+
+	    #login-form button[type="submit"] {
+	        width: 100%;
+	        margin: 0 auto;
+	        padding: 10px;
+	        font-size: 16px;
+	        font-weight: 600;
+	        color: #fff;
+	        background-color: #28a745;
+	        border: none;
+	        border-radius: 6px;
+	        cursor: pointer;
+	    }
+
+	    #login-form button[type="submit"]:hover {
+	        background-color: #1e7e34;
+    }
+</style>
+	</head>
+	<body>
+		<center>
+			<h3>Employee Login</h3>
+		</center>
+		<form id="login-form">
+		    {% csrf_token %}
+		    <label for="id_email">Email:</label>
+		    <input type="email" id="id_email" name="email" required>
+		    <br>
+		    <label for="id_password">Password:</label>
+		    <input type="password" id="id_password" name="password" required>
+		    <br>
+		    <br>
+		    <button type="submit">Log in</button>
+	    </form>
+	    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.0/js.cookie.min.js"></script>
+	    <script>
+	    	 $('#login-form').submit(function(event) {
+	            event.preventDefault();
+	            
+	            var email = $('#id_email').val();
+	            var password = $('#id_password').val();
+
+	            // Perform client-side validation
+	            if (!validateEmail(email)) {
+	                displayError('Invalid email address.');
+	                return;
+	            }
+	            
+	            if (!validatePassword(password)) {
+	                displayError('Invalid password.');
+	                return;
+	            }
+
+
+	           	var empLoginData = {
+	           		email: email,
+	           		password: password
+	           	};
+
+		          // login api
+	             $.ajax({
+	                type: 'POST',
+	                url: '/api/v1/login',
+	                data:JSON.stringify(empLoginData),
+	                success: function(response) {
+	                	// console.log(response,response.token);
+	                	// Store token in a cookie
+                        Cookies.set('token', response.token);
+
+                        window.location.href = '/emp_detail';  // Redirect to the 
+	                },
+	                error: function() {
+	                    alert('An error occurred during login.');
+	                    console.log(response.message);
+	                }
+	            });
+
+
+	             // Email validation function
+		        function validateEmail(email) {
+		            var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		            return regex.test(email);
+		        }
+		        
+		        // Password validation function
+		        function validatePassword(password) {
+		        	var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{}|\\:;"'<>,.?/~]).{8,}$/;
+		        	return regex.test(password);	
+		            // return password.length >= 8;
+		        }
+		        
+		        // Error message display function
+		        function displayError(message) {
+		           alert(message);
+		        }
+        	});
+	    </script>
+	</body>
+</html>

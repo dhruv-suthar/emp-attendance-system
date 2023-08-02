@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+	<head>
+		<title></title>
+		<style>
+			 .success-message {
+            	color: green;
+            	/*margin: aut;*/
+            	/*width: 50%;*/
+            	padding: 5px;
+
+        	}
+        	table
+		{
+			margin: 0 auto;
+			/*width: 100%;*/
+		}
+		th {
+	    background-color: #f2f2f2;
+	    text-align: left;
+	    padding: 8px;
+	  }
+	  
+	  tr:nth-child(even) {
+	    background-color: #f9f9f9;
+	  }
+	  
+	  td {
+	    padding: 8px;
+	    border-bottom: 1px solid #ddd;
+	  }
+	  .logout-message{
+	  	display: none;
+	  }
+		</style>
+	</head>
+	<body>
+		<center>
+    	<p class="success-message">Login time noted: <b id="employee_logintime"></b></p>
+			
+		 <h3>Employee Details</h3>
+		 </center>
+		<table>
+        <tbody>
+             <tr>
+                <th>Name</th>
+              	<td id="employee_name">{{employee.name}}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+              	<td id="employee_email">{{employee.email}}</td>
+            </tr>
+              <tr>
+                <th>Birth date</th>
+              	<td id="employee_dob">{{employee.logout}}</td>
+            </tr>
+             <tr>
+                <th>Role</th>
+              	<td id="employee_role">{{employee.role}}</td>
+            </tr>
+        </tbody>
+    </table>
+  	<br>
+    <hr>
+    <br>
+   	<center><button id="logout_btn" onclick="logout()">Logout</button></center> 
+   	<center>
+   		<p class="success-message logout-message" >Logout time noted: <b id="employee_logouttime"></b></p>
+   	</center> 	
+   	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.0/js.cookie.min.js"></script>
+    <script>
+    	$(document).ready(function() {
+        // Get token from cookies
+        var token = Cookies.get('token');
+        
+        // If token does not exist, redirect to '/emp_login' page
+        if (!token) {
+            window.location.href = '/emp_login';
+        } else {
+            // Perform actions with the token
+            console.log('Token:', token);
+            
+            $.ajax({
+                type: 'GET',
+                url: '/api/v1/user/profile',
+                headers: {
+                    'Authorization': token
+                },
+                success: function(response) {
+                    // Handle the response from the API endpoint
+                    console.log(response);
+
+                    $('#employee_name').text(response.name);
+                    $('#employee_email').text(response.email);
+                    $('#employee_dob').text(response.dob);
+                    $('#employee_role').text(response.role);
+                    console.log(response.login_datetime);
+                    var loginDatetime = new Date(response.login_datetime);
+                    var formattedLoginDatetime = loginDatetime.toLocaleString('en-US', { 
+                	  timeZone: 'UTC',
+				      year: 'numeric', 
+				      month: 'short', 
+				      day: 'numeric',
+				      hour: 'numeric',
+				      minute: 'numeric',
+				      second: 'numeric'
+				    });
+
+                    $('#employee_logintime').text(formattedLoginDatetime);
+                    
+                    // Add your code to process the response data
+                },
+                error: function() {
+                    alert('An error occurred while making the API request.');
+                }
+            });
+            
+        }
+    });
+
+    	function logout(){
+    		    $("#logout_btn").prop("disabled", true);
+
+    		     var token = Cookies.get('token');
+        
+              $.ajax({
+                type: 'GET',
+                url: '/api/v1/logout',
+                headers: {
+                    'Authorization': token
+                },
+                success: function(response) {
+                    // Handle the response from the API endpoint
+                    console.log(response.logout_datetime);
+                    var logoutDatetime = new Date(response.logout_datetime);
+                    var formattedLogoutDatetime = logoutDatetime.toLocaleString('en-US', { 
+                	  timeZone: 'UTC',
+				      year: 'numeric', 
+				      month: 'short', 
+				      day: 'numeric',
+				      hour: 'numeric',
+				      minute: 'numeric',
+				      second: 'numeric'
+				    });
+
+                    $('#employee_logouttime').text(formattedLogoutDatetime);
+
+                     Cookies.remove('token');
+
+                     $('.logout-message').show();
+
+
+                     setTimeout( window.location.href = '/upcoming_emps_birthday', 5000);
+                     
+                    
+                    // Add your code to process the response data
+                },
+                error: function() {
+                    alert('An error occurred while making the API request.');
+                },
+                complete: function() {
+		          // Enable the logout button
+		          $("#logout_btn").prop("disabled", false);
+		        }
+            });
+
+    	} 
+	    
+	    </script>
+        
+
+	</body>
+</html>	
+
